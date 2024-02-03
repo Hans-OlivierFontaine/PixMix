@@ -1,8 +1,3 @@
-# PixMix
-A simple implementation of PixMix for Pytorch
-Below is a template for a `README.md` file for a project that includes PixMix augmentation and a training loop for a ResNet model on the CIFAR-100 dataset, as well as `setup.sh` operations for setting up the environment and downloading datasets from Kaggle.
-
----
 
 # PixMix Augmentation with ResNet on CIFAR-100
 
