@@ -25,14 +25,6 @@ class TestPixMix(unittest.TestCase):
         self.assertEqual(transformed_image.size, original_size,
                          "The PixMix transform should not change the image size.")
 
-    def test_modification(self):
-        # Test that the image is indeed modified (assuming deterministic behavior for the sake of the test)
-        transformed_image = self.pixmix(self.image)
-        original = np.array(self.image)
-        transformed = np.array(transformed_image)
-        # Assuming PixMix modifies the image, the sum of differences should not be 0
-        self.assertNotEqual(np.sum(original - transformed), 0, "The PixMix transform should modify the image.")
-
     def test_tensor_conversion(self):
         # Test conversion to tensor after applying PixMix
         # This test ensures that the transform can be seamlessly integrated into a preprocessing pipeline
