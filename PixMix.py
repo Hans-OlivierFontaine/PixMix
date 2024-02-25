@@ -95,16 +95,16 @@ class RandomErasing:
         return img
 
 
-def alpha_blend(image_a: Image, image_b: Image, alpha=0.5):
+def alpha_blend(image_a: Image, image_b: Image, alpha=0.2):
     image_a = image_a.convert("RGBA")
     image_b = image_b.convert("RGBA")
 
     image_b = image_b.resize(image_a.size)
 
-    return Image.blend(image_a, image_b, alpha).convert("RGB")
+    return Image.blend(image_a, image_b, random.random() * alpha).convert("RGB")
 
 
-def adaptive_blend(image_a: Image, image_b: Image, alpha=0.5):
+def adaptive_blend(image_a: Image, image_b: Image, alpha=0.2):
     image_a = image_a.convert("RGBA")
     image_b = image_b.convert("RGBA")
 
@@ -113,8 +113,8 @@ def adaptive_blend(image_a: Image, image_b: Image, alpha=0.5):
     brightness_a = sum(ImageStat.Stat(image_a).mean[:3]) / 3
     brightness_b = sum(ImageStat.Stat(image_b).mean[:3]) / 3
 
-    beta = alpha + (brightness_a - brightness_b) / 255 / 2
-    beta = min(max(beta, 0), 1)
+    beta = (brightness_a - brightness_b) / 255 / 2
+    beta = min(max(beta, (random.random() * alpha) / 4), (random.random() * alpha))
     return Image.blend(image_a, image_b, beta).convert("RGB")
 
 
@@ -129,7 +129,7 @@ class PixMix:
     default_mix_op = [alpha_blend,
                       adaptive_blend]
 
-    def __init__(self, mixing_dir: Path = Path("./data/fractals/"), k=4, beta=3, augment_ops=None, mix_ops=None):
+    def __init__(self, mixing_dir: Path = Path("./data/fractals/"), k=4, alpha=0.2, augment_ops=None, mix_ops=None):
         """
         Args:
             mixing_dir (list of PIL.Image): directory of images to be used for mixing.
@@ -144,18 +144,17 @@ class PixMix:
         assert isinstance(mix_ops, list) or mix_ops is None
         self.mixing_dir = mixing_dir
         self.k = k
-        self.beta = beta
+        self.alpha = alpha
         self.augment_ops = augment_ops if augment_ops is not None else self.default_augment
         self.mix_ops = mix_ops if mix_ops is not None else self.default_mix_op
         self.fractal_files = list(self.mixing_dir.iterdir())
 
     def __call__(self, xorig):
-        print(type(xorig))
         xpixmix = random.choice([self.augment(xorig), xorig])
         for _ in range(random.choice(range(self.k + 1))):
             mix_image = random.choice([self.augment(xorig), self._get_random_mixer()])
             mix_op = random.choice(self.mix_ops)
-            xpixmix = mix_op(xpixmix, mix_image, self.beta)
+            xpixmix = mix_op(xpixmix, mix_image, self.alpha)
         return xpixmix
 
     def _get_random_mixer(self):
