@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 def visualize_augmentation(img: Image, aug):
-    augmented_image = aug(img)
+    augmented_image = aug(img.copy())
     width, height = img.size
     combined_image = Image.new("RGB", (width * 2, height))
     combined_image.paste(img, (0, 0))
